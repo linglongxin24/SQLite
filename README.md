@@ -1,0 +1,6 @@
+##[【玩转SQLite系列】(一)初识SQLite,重拾sql语句](note/1.acquaintance.md)
+##[【玩转SQLite系列】(二)SQLite创建和打开数据库的三种方式](note/2.create_database_three_ways.md)
+##[【玩转SQLite系列】(三)通过sql语句操作SQLite数据库](note/3.operate_by_sql.md)
+##[【玩转SQLite系列】(四)通过Android提供的API操作SQLite数据库](note/4.operate_by_api.md)
+##[【玩转SQLite系列】(五)SQLite数据库优化](note/5.optimize.md)
+##[【玩转SQLite系列】(六)SQLite数据库应用案例实现历史搜索记录](note/6.apply_in_search.md)
