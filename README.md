@@ -4,3 +4,4 @@
 ##[【玩转SQLite系列】(四)通过Android提供的API操作SQLite数据库](note/4.operate_by_api.md)
 ##[【玩转SQLite系列】(五)SQLite数据库优化](note/5.optimize.md)
 ##[【玩转SQLite系列】(六)SQLite数据库应用案例实现历史搜索记录](note/6.apply_in_search.md)
+##[【玩转SQLite系列】(七)打造轻量级ORM工具类SQLiteDbUtil操作数据库](note/7.sqlitedbutils.md)
