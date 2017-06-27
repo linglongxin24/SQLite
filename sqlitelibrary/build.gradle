@@ -1,12 +1,17 @@
 apply plugin: 'com.android.library'
+
+def mavenVersionCode =2
+def mavenVersionName = "0.2"
+
 android {
     compileSdkVersion 23
-    buildToolsVersion "23.0.2"
+    buildToolsVersion '25.0.0'
 
     defaultConfig {
         minSdkVersion 9
         targetSdkVersion 23
-        versionName "1.0"
+        versionCode mavenVersionCode
+        versionName mavenVersionName
     }
     buildTypes {
         release {
@@ -17,8 +22,14 @@ android {
 }
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:appcompat-v7:23.3.0'
 }
+
+
+
+
+
+
+
 
 /** 以下开始是将Android Library上传到jcenter的相关配置**/
 
@@ -35,7 +46,7 @@ group = "cn.bluemobi.dylan"
 //发布到JCenter上的项目名字，必须填写
 def libName = "sqlitelibrary"
 // 版本号，下次更新是只需要更改版本号即可
-version = "0.2"
+version = mavenVersionName
 /**  上面配置后上传至jcenter后的编译路径是这样的： compile 'cn.bluemobi.dylan:sqlitelibrary:1.0'  **/
 
 //生成源文件
@@ -79,8 +90,11 @@ install {
         pom {
             project {
                 packaging 'aar'
-                name 'This is a lightweight SQLite database framework'
+                name 'sqlitelibrary'
                 url siteUrl
+                groupId 'cn.bluemobi.dylan'
+                artifactId 'sqlitelibrary'
+                description 'This is a lightweight SQLite database framework'
                 licenses {
                     license {
                         name 'This is a lightweight SQLite database framework'
@@ -119,5 +133,14 @@ bintray {
         vcsUrl = gitUrl
         licenses = ["Apache-2.0"]
         publish = true
+        publicDownloadNumbers = true
+        version {
+            desc = 'This is a lightweight SQLite database framework'
+            gpg {
+                sign = true //Determines whether to GPG sign the files. The default is false
+                passphrase = properties.getProperty("bintray.gpg.password")
+                //Optional. The passphrase for GPG signing'
+            }
+        }
     }
 }
