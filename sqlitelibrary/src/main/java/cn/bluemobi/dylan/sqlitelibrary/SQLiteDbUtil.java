@@ -8,18 +8,21 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
 import android.text.TextUtils;
+import android.util.Log;
 
 import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.logging.Logger;
 
 /**
  * SQLite封装工具类
@@ -179,21 +182,54 @@ public class SQLiteDbUtil {
      */
     public <T> void createTable(Class<T> c) {
         String TABLE_NAME = JavaReflectUtil.getClassName(c);
-        String[] column = JavaReflectUtil.getAttributeNames(c);
-        Object[] type = JavaReflectUtil.getAttributeType(c);
+        List<String> column = new ArrayList<>(Arrays.asList(JavaReflectUtil.getAttributeNames(c)));
+        List<Class> type = new ArrayList<>(Arrays.asList(JavaReflectUtil.getAttributeType(c)));
+        int idIndex = column.indexOf("id");
+        if (idIndex != -1) {
+            column.remove(idIndex);
+            type.remove(idIndex);
+        }
         String sql = "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + "(";
         sql += "id  Integer PRIMARY KEY AUTOINCREMENT,";
-        for (int i = 0; i < column.length; i++) {
-            if (!"id".equals(column[i])) {
-                if (i != column.length - 1) {
-                    sql += column[i] + " " + type.getClass().getSimpleName() + ",";
-                } else {
-                    sql += column[i] + " " + type.getClass().getSimpleName();
-                }
+        for (int i = 0; i < column.size(); i++) {
+            if (i != column.size() - 1) {
+                sql += column.get(i)+ " " + getType(type.get(i)) + ",";
+            } else {
+                sql += column.get(i) + " " + getType(type.get(i));
             }
         }
         sql += ")";
+        Log.d(TAG, "创建表" + TABLE_NAME + " sql=" + sql);
         execSQL(sql);
+    }
+
+    private String getType(Class type) {
+        if (type.equals(String.class)) {
+            return "String";
+        } else if (type.equals(Integer.class) || type.getName().equals("int")) {
+            return "Integer";
+        } else if (type.equals(Character.class) || type.getName().equals("char")) {
+            return "Character";
+        } else if (type.equals(Boolean.class) || type.getName().equals("boolean")) {
+            return "boolean";
+        } else if (type.equals(Float.class) || type.getName().equals("float")) {
+            return "Float";
+        } else if (type.equals(Double.class) || type.getName().equals("double")) {
+            return "Double";
+        } else if (type.equals(Byte.class) || type.getName().equals("byte")) {
+            return "Byte";
+        } else if (type.equals(Short.class) || type.getName().equals("short")) {
+            return "Short";
+        } else if (type.equals(Long.class) || type.getName().equals("long")) {
+            return "Long";
+        } else if (type.equals(Date.class)) {
+            return "Date";
+        } else if (type.equals(java.sql.Date.class)) {
+            return "Date";
+        } else {
+            return "String";
+        }
+
     }
 
     /**
@@ -438,7 +474,7 @@ public class SQLiteDbUtil {
      * @param <T>           泛型对象
      * @return 查询出来的数据对象
      */
-    public <T>  List<T> query(Class<T> c, String selection, String[] selectionArgs) {
+    public <T> List<T> query(Class<T> c, String selection, String[] selectionArgs) {
 
         if (c == null) {
             return null;

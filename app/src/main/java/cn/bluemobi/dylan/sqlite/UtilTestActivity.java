@@ -14,6 +14,7 @@ import java.util.Map;
 
 import cn.bluemobi.dylan.sqlite.contacts.Contacts;
 import cn.bluemobi.dylan.sqlite.mode.User;
+import cn.bluemobi.dylan.sqlite.mode.UserDB;
 import cn.bluemobi.dylan.sqlitelibrary.JavaReflectUtil;
 import cn.bluemobi.dylan.sqlitelibrary.SQLiteDbUtil;
 
@@ -31,8 +32,10 @@ public class UtilTestActivity extends AppCompatActivity {
         getSupportActionBar().setTitle("通过封装的工具类操作SQLite");
         setContentView(R.layout.ac_api_operate);
         SQLiteDbUtil.getSQLiteDbUtil().openOrCreateDataBase(this);
-        Log.d(Contacts.TAG, "User类的所有信息：" + Arrays.toString(JavaReflectUtil.getAttributeNames(User.class)));
-        Log.d(Contacts.TAG, "User类的所有信息：" +  Arrays.toString(JavaReflectUtil.getAttributeType(User.class)));
+        Log.d(Contacts.TAG, "User类getAttributeNames：" + Arrays.toString(JavaReflectUtil.getAttributeNames(User.class)));
+        Log.d(Contacts.TAG, "User类getAttributeType：" + Arrays.toString(JavaReflectUtil.getAttributeType(User.class)));
+        Log.d(Contacts.TAG, "UserDB类的getAttributeNames：" +  Arrays.toString(JavaReflectUtil.getAttributeNames(UserDB.class)));
+        Log.d(Contacts.TAG, "UserDB类的getAttributeType：" +  Arrays.toString(JavaReflectUtil.getAttributeType(UserDB.class)));
     }
 
     /**
@@ -46,7 +49,8 @@ public class UtilTestActivity extends AppCompatActivity {
      * @param v
      */
     public void create(View v) {
-        SQLiteDbUtil.getSQLiteDbUtil().createTable(User.class);
+//        SQLiteDbUtil.getSQLiteDbUtil().createTable(User.class);
+        SQLiteDbUtil.getSQLiteDbUtil().createTable(UserDB.class);
     }
 
     /**
