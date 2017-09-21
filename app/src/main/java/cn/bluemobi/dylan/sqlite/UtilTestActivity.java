@@ -49,8 +49,8 @@ public class UtilTestActivity extends AppCompatActivity {
      * @param v
      */
     public void create(View v) {
-//        SQLiteDbUtil.getSQLiteDbUtil().createTable(User.class);
-        SQLiteDbUtil.getSQLiteDbUtil().createTable(UserDB.class);
+        SQLiteDbUtil.getSQLiteDbUtil().createTable(User.class);
+//        SQLiteDbUtil.getSQLiteDbUtil().createTable(UserDB.class);
     }
 
     /**
@@ -82,7 +82,7 @@ public class UtilTestActivity extends AppCompatActivity {
         user.setName("张三");
         user.setAge(22);
         user.setIntegral(12.03);
-        user.setTime(new Date());
+//        user.setTime(new Date());
         long num = SQLiteDbUtil.getSQLiteDbUtil().insert(user);
         if (num == -1) {
             Toast.makeText(this, "插入失败", Toast.LENGTH_SHORT).show();

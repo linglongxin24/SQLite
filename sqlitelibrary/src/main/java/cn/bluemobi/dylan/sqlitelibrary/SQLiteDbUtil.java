@@ -193,7 +193,7 @@ public class SQLiteDbUtil {
         sql += "id  Integer PRIMARY KEY AUTOINCREMENT,";
         for (int i = 0; i < column.size(); i++) {
             if (i != column.size() - 1) {
-                sql += column.get(i)+ " " + getType(type.get(i)) + ",";
+                sql += column.get(i) + " " + getType(type.get(i)) + ",";
             } else {
                 sql += column.get(i) + " " + getType(type.get(i));
             }
@@ -638,9 +638,9 @@ public class SQLiteDbUtil {
                 } else if (type.equals(Long.class) || type.getName().equals("long")) {
                     value = cursor.getLong(cursor.getColumnIndex(column));
                 } else if (type.equals(Date.class)) {
-                    value = new Date(cursor.getString(cursor.getColumnIndex(column)));
+                    value = TextUtils.isEmpty(cursor.getString(cursor.getColumnIndex(column))) ? null : new Date(cursor.getString(cursor.getColumnIndex(column)));
                 } else if (type.equals(java.sql.Date.class)) {
-                    value = java.sql.Date.valueOf(cursor.getString(cursor.getColumnIndex(column)));
+                    value = TextUtils.isEmpty(cursor.getString(cursor.getColumnIndex(column))) ? null : java.sql.Date.valueOf(cursor.getString(cursor.getColumnIndex(column)));
                 }
                 method.invoke(t, value);
             }
