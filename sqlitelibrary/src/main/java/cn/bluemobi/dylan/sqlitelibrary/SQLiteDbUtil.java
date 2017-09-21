@@ -404,12 +404,13 @@ public class SQLiteDbUtil {
     /**
      * 根据条件修改一条数据
      *
-     * @param t     要修改的对象
-     * @param <T>   泛型对象
-     * @param where 要修改的条件
+     * @param t           要修改的对象
+     * @param <T>         泛型对象
+     * @param whereClause 要修改的条件
+     * @param whereArgs   要修改的条件的值
      * @return [影响的行数]the number of rows affected
      */
-    public <T> int update(T t, String where) {
+    public <T> int update(T t, String whereClause, String[] whereArgs) {
         if (t == null) {
             return -1;
         }
@@ -418,7 +419,7 @@ public class SQLiteDbUtil {
         int num = 0;
         try {
             open();
-            num = sqLiteDatabase.update(TABLE_NAME, contentValues, where, null);
+            num = sqLiteDatabase.update(TABLE_NAME, contentValues, whereClause, whereArgs);
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
