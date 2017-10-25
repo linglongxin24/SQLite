@@ -13,6 +13,7 @@ public class User {
     private Double integral;
     private Date time;
     private boolean flag;
+    private String  description;
 
     public int getAge() {
         return age;
@@ -67,15 +68,25 @@ public class User {
         return this;
     }
 
+    public String getDescription() {
+        return description;
+    }
+
+    public User setDescription(String description) {
+        this.description = description;
+        return this;
+    }
+
     @Override
     public String toString() {
         return "User{" +
-                "age=" + age +
-                ", id=" + id +
+                "id=" + id +
                 ", name='" + name + '\'' +
+                ", age=" + age +
                 ", integral=" + integral +
                 ", time=" + time +
                 ", flag=" + flag +
+                ", description='" + description + '\'' +
                 '}';
     }
 }

@@ -184,23 +184,52 @@ public class SQLiteDbUtil {
         String TABLE_NAME = JavaReflectUtil.getClassName(c);
         List<String> column = new ArrayList<>(Arrays.asList(JavaReflectUtil.getAttributeNames(c)));
         List<Class> type = new ArrayList<>(Arrays.asList(JavaReflectUtil.getAttributeType(c)));
-        int idIndex = column.indexOf("id");
-        if (idIndex != -1) {
-            column.remove(idIndex);
-            type.remove(idIndex);
-        }
-        String sql = "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + "(";
-        sql += "id  Integer PRIMARY KEY AUTOINCREMENT,";
-        for (int i = 0; i < column.size(); i++) {
-            if (i != column.size() - 1) {
-                sql += column.get(i) + " " + getType(type.get(i)) + ",";
-            } else {
-                sql += column.get(i) + " " + getType(type.get(i));
+        if (!isTableExist(TABLE_NAME)) {//表不存在，创建表
+            int idIndex = column.indexOf("id");
+            if (idIndex != -1) {
+                column.remove(idIndex);
+                type.remove(idIndex);
+            }
+            String sql = "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + "(";
+            sql += "id  Integer PRIMARY KEY AUTOINCREMENT,";
+            for (int i = 0; i < column.size(); i++) {
+                if (i != column.size() - 1) {
+                    sql += column.get(i) + " " + getType(type.get(i)) + ",";
+                } else {
+                    sql += column.get(i) + " " + getType(type.get(i));
+                }
+            }
+            sql += ")";
+            Log.d(TAG, "创建表" + TABLE_NAME + " sql=" + sql);
+            execSQL(sql);
+        } else {
+            String sql = "PRAGMA table_info([" + TABLE_NAME + "])";
+            List<Map<String, Object>> mapList = rawQuery(sql);
+            List<String> oldColumn = new ArrayList<>();
+            for (int i = 0; i < mapList.size(); i++) {//获取原表字段
+                String oldColumnName = mapList.get(i).get("name").toString();
+                oldColumn.add(oldColumnName);
+            }
+            for (int i = 0; i < column.size(); i++) {//判断是否有新增字段
+                String newColumn = column.get(i);
+                if (!oldColumn.contains(newColumn)) {
+                    String addColumnSql = "ALTER TABLE " + TABLE_NAME + " ADD COLUMN " + newColumn + " " +  getType(type.get(i));
+                    execSQL(addColumnSql);
+                    Log.d(TAG, "升级表【"+ TABLE_NAME +"】新字段"+newColumn+",sql="+addColumnSql);
+                }
             }
         }
-        sql += ")";
-        Log.d(TAG, "创建表" + TABLE_NAME + " sql=" + sql);
-        execSQL(sql);
+    }
+
+    /**
+     * 判断表是否存在
+     *
+     * @return 表名
+     */
+
+    private boolean isTableExist(String tabName) {
+        String sql = "SELECT count(*) FROM sqlite_master WHERE type='table' AND name='" + tabName + "'";
+        return (rawQuery(sql) != null && rawQuery(sql).size() > 0);
     }
 
     private String getType(Class type) {
