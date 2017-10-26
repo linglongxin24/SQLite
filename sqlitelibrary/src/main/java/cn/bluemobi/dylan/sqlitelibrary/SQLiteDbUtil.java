@@ -213,9 +213,9 @@ public class SQLiteDbUtil {
             for (int i = 0; i < column.size(); i++) {//判断是否有新增字段
                 String newColumn = column.get(i);
                 if (!oldColumn.contains(newColumn)) {
-                    String addColumnSql = "ALTER TABLE " + TABLE_NAME + " ADD COLUMN " + newColumn + " " +  getType(type.get(i));
+                    String addColumnSql = "ALTER TABLE " + TABLE_NAME + " ADD COLUMN " + newColumn + " " + getType(type.get(i));
                     execSQL(addColumnSql);
-                    Log.d(TAG, "升级表【"+ TABLE_NAME +"】新字段"+newColumn+",sql="+addColumnSql);
+                    Log.d(TAG, "升级表【" + TABLE_NAME + "】新字段" + newColumn + ",sql=" + addColumnSql);
                 }
             }
         }
@@ -229,7 +229,14 @@ public class SQLiteDbUtil {
 
     private boolean isTableExist(String tabName) {
         String sql = "SELECT count(*) FROM sqlite_master WHERE type='table' AND name='" + tabName + "'";
-        return (rawQuery(sql) != null && rawQuery(sql).size() > 0);
+        List<Map<String, Object>> rawQuery = rawQuery(sql);
+        if ((rawQuery != null && rawQuery.size() > 0)) {
+            int count = Integer.parseInt(rawQuery.get(0).get("count(*)").toString());
+            if (count > 0) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private String getType(Class type) {
