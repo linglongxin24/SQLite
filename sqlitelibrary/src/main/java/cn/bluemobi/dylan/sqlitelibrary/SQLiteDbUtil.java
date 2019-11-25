@@ -367,10 +367,11 @@ public class SQLiteDbUtil {
      *
      * @param c     要删除的对象类
      * @param <T>   泛型对象
-     * @param where 要删除条件
+     * @param whereClause 要修改的条件
+     * @param whereArgs   要修改的条件的值
      * @return [影响的行数]the number of rows affected
      */
-    public <T> int delete(Class<T> c, String where) {
+    public <T> int delete(Class<T> c,  String whereClause, String[] whereArgs) {
         if (c == null) {
             return 0;
         }
@@ -378,7 +379,7 @@ public class SQLiteDbUtil {
         int num = 0;
         try {
             open();
-            num = sqLiteDatabase.delete(TABLE_NAME, where, null);
+            num = sqLiteDatabase.delete(TABLE_NAME, whereClause, whereArgs);
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
