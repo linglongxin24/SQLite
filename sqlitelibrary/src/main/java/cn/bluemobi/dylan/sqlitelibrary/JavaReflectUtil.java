@@ -1,5 +1,7 @@
 package cn.bluemobi.dylan.sqlitelibrary;
 
+import android.os.Parcelable;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -7,8 +9,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static android.R.attr.value;
 
 /**
  * Created by yuandl on 2016-11-21.
@@ -37,6 +37,7 @@ public class JavaReflectUtil {
         if (c == null) {
             return null;
         }
+        Class<? extends Class> aClass = c.getClass();
         Field[] declaredFields = new Field[0];
         try {
             declaredFields = c.getDeclaredFields();
@@ -52,6 +53,14 @@ public class JavaReflectUtil {
             /**忽略serialVersionUID**/
             if (declaredFields[i].getName().equals("serialVersionUID")) {
                 continue;
+            }
+            try {
+                /**忽略Parcelable.Creator**/
+                Class<?> parcelableCreator = Class.forName(Parcelable.Creator.class.getName());
+                if (declaredFields[i].getType().equals(parcelableCreator)) {
+                    continue;
+                }
+            } catch (ClassNotFoundException e) {
             }
             names.add(declaredFields[i].getName());
         }
@@ -77,11 +86,21 @@ public class JavaReflectUtil {
 
         List<Object> types = new ArrayList<>();
         for (int i = 0; i < declaredFields.length; i++) {
+            /**忽略编译产生的属性**/
             if (declaredFields[i].isSynthetic()) {
                 continue;
             }
+            /**忽略serialVersionUID**/
             if (declaredFields[i].getName().equals("serialVersionUID")) {
                 continue;
+            }
+            try {
+                /**忽略Parcelable.Creator**/
+                Class<?> parcelableCreator = Class.forName(Parcelable.Creator.class.getName());
+                if (declaredFields[i].getType().equals(parcelableCreator)) {
+                    continue;
+                }
+            } catch (ClassNotFoundException e) {
             }
             types.add(declaredFields[i].getType());
         }

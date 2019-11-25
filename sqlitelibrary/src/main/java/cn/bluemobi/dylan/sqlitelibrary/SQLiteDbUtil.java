@@ -18,11 +18,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.logging.Logger;
 
 /**
  * SQLite封装工具类
@@ -365,13 +362,13 @@ public class SQLiteDbUtil {
     /**
      * 根据条件删除一条数据
      *
-     * @param c     要删除的对象类
-     * @param <T>   泛型对象
+     * @param c           要删除的对象类
+     * @param <T>         泛型对象
      * @param whereClause 要修改的条件
      * @param whereArgs   要修改的条件的值
      * @return [影响的行数]the number of rows affected
      */
-    public <T> int delete(Class<T> c,  String whereClause, String[] whereArgs) {
+    public <T> int delete(Class<T> c, String whereClause, String[] whereArgs) {
         if (c == null) {
             return 0;
         }
@@ -679,6 +676,8 @@ public class SQLiteDbUtil {
                     value = TextUtils.isEmpty(cursor.getString(cursor.getColumnIndex(column))) ? null : new Date(cursor.getString(cursor.getColumnIndex(column)));
                 } else if (type.equals(java.sql.Date.class)) {
                     value = TextUtils.isEmpty(cursor.getString(cursor.getColumnIndex(column))) ? null : java.sql.Date.valueOf(cursor.getString(cursor.getColumnIndex(column)));
+                } else {
+                    continue;
                 }
                 method.invoke(t, value);
             }

@@ -82,6 +82,7 @@ public class UtilTestActivity extends AppCompatActivity {
         user.setName("张三");
         user.setAge(22);
         user.setIntegral(12.03);
+        user.setFlag(true);
 //        user.setTime(new Date());
         long num = SQLiteDbUtil.getSQLiteDbUtil().insert(user);
         if (num == -1) {

@@ -1,12 +1,15 @@
 package cn.bluemobi.dylan.sqlite.mode;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.util.Date;
 
 /**
  * Created by yuandl on 2016-11-21.
  */
 
-public class User {
+public class User implements Parcelable {
     private int id;
     private String name;
     private int age;
@@ -89,4 +92,46 @@ public class User {
                 ", description='" + description + '\'' +
                 '}';
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(this.id);
+        dest.writeString(this.name);
+        dest.writeInt(this.age);
+        dest.writeValue(this.integral);
+        dest.writeLong(this.time != null ? this.time.getTime() : -1);
+        dest.writeByte(this.flag ? (byte) 1 : (byte) 0);
+        dest.writeString(this.description);
+    }
+
+    public User() {
+    }
+
+    protected User(Parcel in) {
+        this.id = in.readInt();
+        this.name = in.readString();
+        this.age = in.readInt();
+        this.integral = (Double) in.readValue(Double.class.getClassLoader());
+        long tmpTime = in.readLong();
+        this.time = tmpTime == -1 ? null : new Date(tmpTime);
+        this.flag = in.readByte() != 0;
+        this.description = in.readString();
+    }
+
+    public static final Parcelable.Creator<User> CREATOR = new Parcelable.Creator<User>() {
+        @Override
+        public User createFromParcel(Parcel source) {
+            return new User(source);
+        }
+
+        @Override
+        public User[] newArray(int size) {
+            return new User[size];
+        }
+    };
 }
