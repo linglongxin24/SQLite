@@ -83,6 +83,7 @@ public class UtilTestActivity extends AppCompatActivity {
         user.setAge(22);
         user.setIntegral(12.03);
         user.setFlag(true);
+        user.setFeature(new byte[512]);
 //        user.setTime(new Date());
         long num = SQLiteDbUtil.getSQLiteDbUtil().insert(user);
         if (num == -1) {
@@ -160,6 +161,8 @@ public class UtilTestActivity extends AppCompatActivity {
         String sql = "SELECT * FROM User";
         List<Map<String, Object>> list = SQLiteDbUtil.getSQLiteDbUtil().rawQuery(sql);
         Log.d(Contacts.TAG, "sql查：共" + list.size() + "个对象=" + list.toString());
+        byte[] feature = (byte[]) list.get(0).get("feature");
+        Log.d(Contacts.TAG, "feature=" + Arrays.toString(feature));
     }
 
     @Override

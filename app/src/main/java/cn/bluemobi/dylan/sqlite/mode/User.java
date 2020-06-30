@@ -3,6 +3,7 @@ package cn.bluemobi.dylan.sqlite.mode;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.util.Arrays;
 import java.util.Date;
 
 /**
@@ -17,6 +18,7 @@ public class User implements Parcelable {
     private Date time;
     private boolean flag;
     private String  description;
+    private byte[]  feature;
 
     public int getAge() {
         return age;
@@ -80,6 +82,14 @@ public class User implements Parcelable {
         return this;
     }
 
+    public byte[] getFeature() {
+        return feature;
+    }
+
+    public void setFeature(byte[] feature) {
+        this.feature = feature;
+    }
+
     @Override
     public String toString() {
         return "User{" +
@@ -90,8 +100,10 @@ public class User implements Parcelable {
                 ", time=" + time +
                 ", flag=" + flag +
                 ", description='" + description + '\'' +
+                ", feature=" + Arrays.toString(feature) +
                 '}';
     }
+
 
     @Override
     public int describeContents() {
@@ -107,6 +119,7 @@ public class User implements Parcelable {
         dest.writeLong(this.time != null ? this.time.getTime() : -1);
         dest.writeByte(this.flag ? (byte) 1 : (byte) 0);
         dest.writeString(this.description);
+        dest.writeByteArray(this.feature);
     }
 
     public User() {
@@ -121,9 +134,10 @@ public class User implements Parcelable {
         this.time = tmpTime == -1 ? null : new Date(tmpTime);
         this.flag = in.readByte() != 0;
         this.description = in.readString();
+        this.feature = in.createByteArray();
     }
 
-    public static final Parcelable.Creator<User> CREATOR = new Parcelable.Creator<User>() {
+    public static final Creator<User> CREATOR = new Creator<User>() {
         @Override
         public User createFromParcel(Parcel source) {
             return new User(source);

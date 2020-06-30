@@ -259,6 +259,13 @@ public class SQLiteDbUtil {
             return "Date";
         } else if (type.equals(java.sql.Date.class)) {
             return "Date";
+        } else if (type.isArray()) {
+            String name = type.getComponentType().getName();
+            if("byte".equals(name)||"Byte".equals(name)){
+                return "Blob";
+            }else{
+                return "String";
+            }
         } else {
             return "String";
         }
@@ -619,7 +626,12 @@ public class SQLiteDbUtil {
             while (cursor.moveToNext()) {
                 Map<String, Object> map = new HashMap<>();
                 for (String column : cursor.getColumnNames()) {
-                    map.put(column, cursor.getString(cursor.getColumnIndex(column)));
+                    int columnIndex = cursor.getColumnIndex(column);
+                    if(cursor.getType(columnIndex)==Cursor.FIELD_TYPE_BLOB){
+                        map.put(column, cursor.getBlob(columnIndex));
+                    }else{
+                        map.put(column, cursor.getString(columnIndex));
+                    }
                 }
                 lists.add(map);
             }
@@ -672,6 +684,8 @@ public class SQLiteDbUtil {
                     value = cursor.getShort(cursor.getColumnIndex(column));
                 } else if (type.equals(Long.class) || type.getName().equals("long")) {
                     value = cursor.getLong(cursor.getColumnIndex(column));
+                } else if (type.isArray()) {
+                    value = cursor.getBlob(cursor.getColumnIndex(column));
                 } else if (type.equals(Date.class)) {
                     value = TextUtils.isEmpty(cursor.getString(cursor.getColumnIndex(column))) ? null : new Date(cursor.getString(cursor.getColumnIndex(column)));
                 } else if (type.equals(java.sql.Date.class)) {
@@ -712,7 +726,11 @@ public class SQLiteDbUtil {
             if (value == null) {
                 contentValues.putNull(column);
             } else {
-                contentValues.put(column, String.valueOf(value));
+                if (value instanceof byte[]) {
+                    contentValues.put(column, (byte[]) value);
+                } else {
+                    contentValues.put(column, String.valueOf(value));
+                }
             }
         }
         contentValues.remove("id");
