@@ -261,9 +261,9 @@ public class SQLiteDbUtil {
             return "Date";
         } else if (type.isArray()) {
             String name = type.getComponentType().getName();
-            if("byte".equals(name)||"Byte".equals(name)){
+            if ("byte".equals(name) || "Byte".equals(name)) {
                 return "Blob";
-            }else{
+            } else {
                 return "String";
             }
         } else {
@@ -586,6 +586,65 @@ public class SQLiteDbUtil {
     }
 
     /**
+     * 根据id查询一条数据
+     *
+     * @param c             要查询的对象类
+     * @param columns       A list of which columns to return. Passing null will
+     *                      return all columns, which is discouraged to prevent reading
+     *                      data from storage that isn't going to be used.
+     * @param selection     A filter declaring which rows to return, formatted as an
+     *                      SQL WHERE clause (excluding the WHERE itself). Passing null
+     *                      will return all rows for the given table.
+     * @param selectionArgs You may include ?s in selection, which will be
+     *                      replaced by the values from selectionArgs, in order that they
+     *                      appear in the selection. The values will be bound as Strings.
+     * @param groupBy       A filter declaring how to group rows, formatted as an SQL
+     *                      GROUP BY clause (excluding the GROUP BY itself). Passing null
+     *                      will cause the rows to not be grouped.
+     * @param having        A filter declare which row groups to include in the cursor,
+     *                      if row grouping is being used, formatted as an SQL HAVING
+     *                      clause (excluding the HAVING itself). Passing null will cause
+     *                      all row groups to be included, and is required when row
+     *                      grouping is not being used.
+     * @param orderBy       How to order the rows, formatted as an SQL ORDER BY clause
+     *                      (excluding the ORDER BY itself). Passing null will use the
+     *                      default sort order, which may be unordered.
+     * @param limit         Limits the number of rows returned by the query,
+     *                      formatted as LIMIT clause. Passing null denotes no LIMIT clause.
+     * @param <T>           泛型对象
+     * @return 查询出来的数据对象
+     */
+    public <T>  List<T> query(Class<T> c,  String[] columns, String selection,
+                       String[] selectionArgs, String groupBy, String having,
+                       String orderBy, String limit) {
+        List<T> lists = null;
+        Cursor cursor = null;
+        try {
+            if (c == null) {
+                return null;
+            }
+            open();
+            String TABLE_NAME = JavaReflectUtil.getClassName(c);
+            cursor = sqLiteDatabase.query(TABLE_NAME, columns, selection, selectionArgs, groupBy, having, orderBy,limit);
+            if (cursor == null) {
+                return null;
+            }
+            lists = new ArrayList<>();
+            while (cursor.moveToNext()) {
+                lists.add(newInstance(c, cursor));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+            close();
+        }
+        return lists;
+    }
+
+    /**
      * 执行Sql语句建表，插入，修改，删除
      *
      * @param sql 要执行的sqk语句
@@ -627,9 +686,9 @@ public class SQLiteDbUtil {
                 Map<String, Object> map = new HashMap<>();
                 for (String column : cursor.getColumnNames()) {
                     int columnIndex = cursor.getColumnIndex(column);
-                    if(cursor.getType(columnIndex)==Cursor.FIELD_TYPE_BLOB){
+                    if (cursor.getType(columnIndex) == Cursor.FIELD_TYPE_BLOB) {
                         map.put(column, cursor.getBlob(columnIndex));
-                    }else{
+                    } else {
                         map.put(column, cursor.getString(columnIndex));
                     }
                 }
