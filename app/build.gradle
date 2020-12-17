@@ -27,4 +27,6 @@ dependencies {
     compile 'com.android.support:appcompat-v7:23.3.0'
     testCompile 'junit:junit:4.12'
     compile project(':sqlitelibrary')
+    //数据库连接工具
+    debugImplementation 'com.amitshekhar.android:debug-db:1.0.1'
 }

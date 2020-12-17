@@ -7,10 +7,9 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import cn.bluemobi.dylan.sqlite.contacts.Contacts;
 import cn.bluemobi.dylan.sqlite.mode.User;
@@ -34,8 +33,9 @@ public class UtilTestActivity extends AppCompatActivity {
         SQLiteDbUtil.getSQLiteDbUtil().openOrCreateDataBase(this);
         Log.d(Contacts.TAG, "User类getAttributeNames：" + Arrays.toString(JavaReflectUtil.getAttributeNames(User.class)));
         Log.d(Contacts.TAG, "User类getAttributeType：" + Arrays.toString(JavaReflectUtil.getAttributeType(User.class)));
-        Log.d(Contacts.TAG, "UserDB类的getAttributeNames：" +  Arrays.toString(JavaReflectUtil.getAttributeNames(UserDB.class)));
-        Log.d(Contacts.TAG, "UserDB类的getAttributeType：" +  Arrays.toString(JavaReflectUtil.getAttributeType(UserDB.class)));
+        Log.d(Contacts.TAG, "UserDB类的getAttributeNames：" + Arrays.toString(JavaReflectUtil.getAttributeNames(UserDB.class)));
+        Log.d(Contacts.TAG, "UserDB类的getAttributeType：" + Arrays.toString(JavaReflectUtil.getAttributeType(UserDB.class)));
+        SQLiteDbUtil.getSQLiteDbUtil().createTable(User.class);
     }
 
     /**
@@ -49,7 +49,7 @@ public class UtilTestActivity extends AppCompatActivity {
      * @param v
      */
     public void create(View v) {
-        SQLiteDbUtil.getSQLiteDbUtil().createTable(User.class);
+//        SQLiteDbUtil.getSQLiteDbUtil().createTable(User.class);
 //        SQLiteDbUtil.getSQLiteDbUtil().createTable(UserDB.class);
     }
 
@@ -78,19 +78,25 @@ public class UtilTestActivity extends AppCompatActivity {
      * @param v
      */
     public void insert(View v) {
-        User user = new User();
-        user.setName("张三");
-        user.setAge(22);
-        user.setIntegral(12.03);
-        user.setFlag(true);
-        user.setFeature(new byte[512]);
-//        user.setTime(new Date());
-        long num = SQLiteDbUtil.getSQLiteDbUtil().insert(user);
-        if (num == -1) {
-            Toast.makeText(this, "插入失败", Toast.LENGTH_SHORT).show();
-        } else {
-            Toast.makeText(this, "成功插入到第" + num + "行", Toast.LENGTH_SHORT).show();
+        List<User> userList = new ArrayList<>();
+        for (int i = 0; i < 10000; i++) {
+
+            User user = new User();
+            user.setName("1.20");
+            user.setAge(22);
+            user.setIntegral(12.03);
+            user.setFlag(true);
+            user.setFeature(new byte[1]);
+            userList.add(user);
         }
+//        user.setTime(new Date());
+        SQLiteDbUtil.getSQLiteDbUtil().insert(userList);
+        Toast.makeText(this, "成功插入10000条数据行", Toast.LENGTH_SHORT).show();
+//        if (num == -1) {
+//            Toast.makeText(this, "插入失败", Toast.LENGTH_SHORT).show();
+//        } else {
+//            Toast.makeText(this, "成功插入到第" + num + "行", Toast.LENGTH_SHORT).show();
+//        }
     }
 
     /**
@@ -159,10 +165,8 @@ public class UtilTestActivity extends AppCompatActivity {
 
         Log.d(Contacts.TAG, "util查：共" + users.size() + "个对象=" + users.toString());
         String sql = "SELECT * FROM User";
-        List<Map<String, Object>> list = SQLiteDbUtil.getSQLiteDbUtil().rawQuery(sql);
-        Log.d(Contacts.TAG, "sql查：共" + list.size() + "个对象=" + list.toString());
-        byte[] feature = (byte[]) list.get(0).get("feature");
-        Log.d(Contacts.TAG, "feature=" + Arrays.toString(feature));
+//        List<Map<String, Object>> list = SQLiteDbUtil.getSQLiteDbUtil().rawQuery(sql);
+//        Log.d(Contacts.TAG, "sql查：共" + list.size() + "个对象=" + list.toString());
     }
 
     @Override

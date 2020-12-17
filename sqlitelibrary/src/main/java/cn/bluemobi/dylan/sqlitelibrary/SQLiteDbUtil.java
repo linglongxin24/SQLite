@@ -177,16 +177,16 @@ public class SQLiteDbUtil {
      * @param <T> 泛型对象
      * @param c   要创建的对象类，自动映射为表名
      */
-    public <T> void createTable(Class<T> c) {
-        String TABLE_NAME = JavaReflectUtil.getClassName(c);
-        List<String> column = new ArrayList<>(Arrays.asList(JavaReflectUtil.getAttributeNames(c)));
-        List<Class> type = new ArrayList<>(Arrays.asList(JavaReflectUtil.getAttributeType(c)));
+    public <T> void createTable(final Class<T> c) {
+        final String TABLE_NAME = JavaReflectUtil.getClassName(c);
+        final List<String> column = new ArrayList<>(Arrays.asList(JavaReflectUtil.getAttributeNames(c)));
+        final List<Class> type = new ArrayList<>(Arrays.asList(JavaReflectUtil.getAttributeType(c)));
+        int idIndex = column.indexOf("id");
+        if (idIndex != -1) {
+            column.remove(idIndex);
+            type.remove(idIndex);
+        }
         if (!isTableExist(TABLE_NAME)) {//表不存在，创建表
-            int idIndex = column.indexOf("id");
-            if (idIndex != -1) {
-                column.remove(idIndex);
-                type.remove(idIndex);
-            }
             String sql = "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + "(";
             sql += "id  Integer PRIMARY KEY AUTOINCREMENT,";
             for (int i = 0; i < column.size(); i++) {
@@ -202,18 +202,69 @@ public class SQLiteDbUtil {
         } else {
             String sql = "PRAGMA table_info([" + TABLE_NAME + "])";
             List<Map<String, Object>> mapList = rawQuery(sql);
-            List<String> oldColumn = new ArrayList<>();
-            for (int i = 0; i < mapList.size(); i++) {//获取原表字段
+
+            Log.d(TAG, "表信息" + mapList);
+            List<String> oldColumnNameList = new ArrayList<>();
+            List<String> oldColumnTypeList = new ArrayList<>();
+            for (int i = 0; i < mapList.size(); i++) {
+                //获取原表字段结构
                 String oldColumnName = mapList.get(i).get("name").toString();
-                oldColumn.add(oldColumnName);
+                String oldColumnType = mapList.get(i).get("type").toString();
+                oldColumnNameList.add(oldColumnName);
+                oldColumnTypeList.add(oldColumnType);
             }
-            for (int i = 0; i < column.size(); i++) {//判断是否有新增字段
+            idIndex = oldColumnNameList.indexOf("id");
+            if (idIndex != -1) {
+                oldColumnNameList.remove(idIndex);
+                oldColumnTypeList.remove(idIndex);
+            }
+            boolean needModifyColumnType = false;
+            for (int i = 0; i < column.size(); i++) {
                 String newColumn = column.get(i);
-                if (!oldColumn.contains(newColumn)) {
-                    String addColumnSql = "ALTER TABLE " + TABLE_NAME + " ADD COLUMN " + newColumn + " " + getType(type.get(i));
+                String newColumnType = getType(type.get(i));
+                if (!oldColumnNameList.contains(newColumn)) {
+                    //判断是否有新增字段
+                    String addColumnSql = "ALTER TABLE " + TABLE_NAME + " ADD COLUMN " + newColumn + " " + newColumnType;
                     execSQL(addColumnSql);
                     Log.d(TAG, "升级表【" + TABLE_NAME + "】新字段" + newColumn + ",sql=" + addColumnSql);
+                } else {
+                    String oldColumnType = oldColumnTypeList.get(i);
+                    if (!newColumnType.equals(oldColumnType)) {
+                        //需要修改表结构
+                        needModifyColumnType = true;
+                        Log.d(TAG, "需要修改表结构newColumnType=" + newColumnType + "  oldColumnType=" + oldColumnType);
+                    }
                 }
+            }
+            //修改表结构
+            if (needModifyColumnType) {
+                new Thread() {
+                    @Override
+                    public void run() {
+                        super.run();
+                        //1.查出原表数据
+                        List<T> list = SQLiteDbUtil.getSQLiteDbUtil().query(c);
+                        //2.删除原表
+                        SQLiteDbUtil.getSQLiteDbUtil().drop(TABLE_NAME);
+
+                        //3. 创建新表
+                        String sql = "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + "(";
+                        sql += "id  Integer PRIMARY KEY AUTOINCREMENT,";
+                        for (int i = 0; i < column.size(); i++) {
+                            if (i != column.size() - 1) {
+                                sql += column.get(i) + " " + getType(type.get(i)) + ",";
+                            } else {
+                                sql += column.get(i) + " " + getType(type.get(i));
+                            }
+                        }
+                        sql += ")";
+                        Log.d(TAG, "创建表" + TABLE_NAME + " sql=" + sql);
+                        execSQL(sql);
+
+                        //4. 导入数据
+                        SQLiteDbUtil.getSQLiteDbUtil().insert(list);
+                    }
+                }.start();
             }
         }
     }
@@ -238,7 +289,7 @@ public class SQLiteDbUtil {
 
     private String getType(Class type) {
         if (type.equals(String.class)) {
-            return "String";
+            return "TEXT";
         } else if (type.equals(Integer.class) || type.getName().equals("int")) {
             return "Integer";
         } else if (type.equals(Character.class) || type.getName().equals("char")) {
@@ -264,10 +315,10 @@ public class SQLiteDbUtil {
             if ("byte".equals(name) || "Byte".equals(name)) {
                 return "Blob";
             } else {
-                return "String";
+                return "TEXT";
             }
         } else {
-            return "String";
+            return "TEXT";
         }
 
     }
@@ -286,6 +337,18 @@ public class SQLiteDbUtil {
         String sql = "DROP TABLE " +
                 "IF EXISTS " +
                 TABLE_NAME;
+        execSQL(sql);
+    }
+
+    /**
+     * 删除数据表
+     *
+     * @param tabName 要删除的表名
+     */
+    public void drop(String tabName) {
+        String sql = "DROP TABLE " +
+                "IF EXISTS " +
+                tabName;
         execSQL(sql);
     }
 
@@ -614,9 +677,9 @@ public class SQLiteDbUtil {
      * @param <T>           泛型对象
      * @return 查询出来的数据对象
      */
-    public <T>  List<T> query(Class<T> c,  String[] columns, String selection,
-                       String[] selectionArgs, String groupBy, String having,
-                       String orderBy, String limit) {
+    public <T> List<T> query(Class<T> c, String[] columns, String selection,
+                             String[] selectionArgs, String groupBy, String having,
+                             String orderBy, String limit) {
         List<T> lists = null;
         Cursor cursor = null;
         try {
@@ -625,7 +688,7 @@ public class SQLiteDbUtil {
             }
             open();
             String TABLE_NAME = JavaReflectUtil.getClassName(c);
-            cursor = sqLiteDatabase.query(TABLE_NAME, columns, selection, selectionArgs, groupBy, having, orderBy,limit);
+            cursor = sqLiteDatabase.query(TABLE_NAME, columns, selection, selectionArgs, groupBy, having, orderBy, limit);
             if (cursor == null) {
                 return null;
             }
