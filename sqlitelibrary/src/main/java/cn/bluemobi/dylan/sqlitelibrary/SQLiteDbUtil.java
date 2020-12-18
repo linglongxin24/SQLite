@@ -238,33 +238,27 @@ public class SQLiteDbUtil {
             }
             //修改表结构
             if (needModifyColumnType) {
-                new Thread() {
-                    @Override
-                    public void run() {
-                        super.run();
-                        //1.查出原表数据
-                        List<T> list = SQLiteDbUtil.getSQLiteDbUtil().query(c);
-                        //2.删除原表
-                        SQLiteDbUtil.getSQLiteDbUtil().drop(TABLE_NAME);
+                //1.查出原表数据
+                List<T> list = SQLiteDbUtil.getSQLiteDbUtil().query(c);
+                //2.删除原表
+                SQLiteDbUtil.getSQLiteDbUtil().drop(TABLE_NAME);
 
-                        //3. 创建新表
-                        String sql = "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + "(";
-                        sql += "id  Integer PRIMARY KEY AUTOINCREMENT,";
-                        for (int i = 0; i < column.size(); i++) {
-                            if (i != column.size() - 1) {
-                                sql += column.get(i) + " " + getType(type.get(i)) + ",";
-                            } else {
-                                sql += column.get(i) + " " + getType(type.get(i));
-                            }
-                        }
-                        sql += ")";
-                        Log.d(TAG, "创建表" + TABLE_NAME + " sql=" + sql);
-                        execSQL(sql);
-
-                        //4. 导入数据
-                        SQLiteDbUtil.getSQLiteDbUtil().insert(list);
+                //3. 创建新表
+                sql = "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + "(";
+                sql += "id  Integer PRIMARY KEY AUTOINCREMENT,";
+                for (int i = 0; i < column.size(); i++) {
+                    if (i != column.size() - 1) {
+                        sql += column.get(i) + " " + getType(type.get(i)) + ",";
+                    } else {
+                        sql += column.get(i) + " " + getType(type.get(i));
                     }
-                }.start();
+                }
+                sql += ")";
+                Log.d(TAG, "创建表" + TABLE_NAME + " sql=" + sql);
+                execSQL(sql);
+
+                //4. 导入数据
+                SQLiteDbUtil.getSQLiteDbUtil().insert(list);
             }
         }
     }
