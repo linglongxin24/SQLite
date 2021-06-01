@@ -22,21 +22,26 @@ android {
     lintOptions {
         abortOnError false
     }
+    task makeJar(type: Copy) {
+        //删除存在的
+        delete 'build/libs/sqlitelibrary-1.0.jar'
+        //设置拷贝的文件
+        from('build/intermediates/aar_main_jar/release/')
+        //打进jar包后的文件目录
+        into('build/libs/')
+        //将classes.jar放入build/libs/目录下
+        //include ,exclude参数来设置过滤
+        //（我们只关心classes.jar这个文件）
+        include('classes.jar')
+        //重命名
+        rename ('classes.jar', 'sqlitelibrary-1.0.jar')
+    }
 
+    makeJar.dependsOn(build)
 }
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
 }
-
-
-task makeJar(type: Copy) {
-    delete 'build/sqlitelibrary_V1.0.jar' //删除之前的旧jar包
-    from('build/intermediates/packaged-classes/debug/default/') //从这个目录下取出默认jar包
-    into('build/') //将jar包输出到指定目录下
-    include('classes.jar')
-    rename('classes.jar', 'sqlitelibrary_V1.0.jar') //自定义jar包的名字
-}
-makeJar.dependsOn(build)
 
 
 
