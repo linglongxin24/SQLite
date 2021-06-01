@@ -18,7 +18,29 @@ public class User implements Parcelable {
     private Date time;
     private boolean flag;
     private String  description;
+    private String  height;
+    private String  weight;
+    private String  userNumber;
+    private String  score;
     private byte[]  feature;
+
+    public String getScore() {
+        return score;
+    }
+
+    public User setScore(String score) {
+        this.score = score;
+        return this;
+    }
+
+    public String getUserNumber() {
+        return userNumber;
+    }
+
+    public User setUserNumber(String userNumber) {
+        this.userNumber = userNumber;
+        return this;
+    }
 
     public int getAge() {
         return age;
@@ -88,6 +110,24 @@ public class User implements Parcelable {
 
     public void setFeature(byte[] feature) {
         this.feature = feature;
+    }
+
+    public String getHeight() {
+        return height;
+    }
+
+    public User setHeight(String height) {
+        this.height = height;
+        return this;
+    }
+
+    public String getWeight() {
+        return weight;
+    }
+
+    public User setWeight(String weight) {
+        this.weight = weight;
+        return this;
     }
 
     @Override

@@ -46,4 +46,10 @@
         android:layout_height="wrap_content"
         android:onClick="util"
         android:text="SQLiteDbUtil封装工具类操作数据库" />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="slectPhoto"
+        android:text="上传图片" />
 </LinearLayout>

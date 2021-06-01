@@ -10,6 +10,8 @@ import android.util.Log;
 import android.util.Pair;
 import android.view.View;
 
+import com.bjtsh.dylan.selectphoto.SelectPhoto;
+
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -78,5 +80,9 @@ public class MainActivity extends AppCompatActivity {
      */
     public void util(View view) {
         startActivity(new Intent(this, UtilTestActivity.class));
+    }
+
+    public void slectPhoto(View view) {
+        new SelectPhoto(this).selectPhoto();
     }
 }

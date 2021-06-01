@@ -1,7 +1,7 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 23
+    compileSdkVersion 29
     buildToolsVersion '25.0.0'
     defaultConfig {
         applicationId "cn.bluemobi.dylan.sqlite"
@@ -29,4 +29,12 @@ dependencies {
     compile project(':sqlitelibrary')
     //数据库连接工具
     debugImplementation 'com.amitshekhar.android:debug-db:1.0.1'
+    //startActivityForResult快捷回调
+    api 'cn.bjtsn.dylan:startActivityForResult:0.0.2'
+    //动态请求权限
+    api'cn.bjtsn.dylan:requestPermission:0.0.1'
+    //图片压缩鲁班
+    api 'top.zibin:Luban:1.1.2'
+    implementation 'com.bjtsn.dylan:selectPhoto:0.0.3'
+    compile 'com.mapzen:on-the-road:0.8.1'
 }

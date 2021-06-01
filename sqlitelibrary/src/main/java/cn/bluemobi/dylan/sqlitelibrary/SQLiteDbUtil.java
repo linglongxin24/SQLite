@@ -228,11 +228,14 @@ public class SQLiteDbUtil {
                     execSQL(addColumnSql);
                     Log.d(TAG, "升级表【" + TABLE_NAME + "】新字段" + newColumn + ",sql=" + addColumnSql);
                 } else {
-                    String oldColumnType = oldColumnTypeList.get(i);
-                    if (!newColumnType.equals(oldColumnType)) {
-                        //需要修改表结构
-                        needModifyColumnType = true;
-                        Log.d(TAG, "需要修改表结构newColumnType=" + newColumnType + "  oldColumnType=" + oldColumnType);
+                    int indexOf = oldColumnNameList.indexOf(newColumn);
+                    if (indexOf != -1) {
+                        String oldColumnType = oldColumnTypeList.get(indexOf);
+                        if (!newColumnType.equals(oldColumnType)) {
+                            //需要修改表结构
+                            needModifyColumnType = true;
+                            Log.d(TAG, "需要修改表结构newColumnType=" + newColumnType + "  oldColumnType=" + oldColumnType);
+                        }
                     }
                 }
             }
